@@ -43,10 +43,21 @@ def get_known():
     content = sorted([int(x.strip()) for x in content])
     return content
 
+def pretty_print(trials):
+    for t in trials:
+        # tedious pretty printing
+        print("\t             test: ", t["test"])
+        print("\t           result: ", t["result"])
+        print("\t              epi: ", " ".join(str(x) for x in t["epi"]))
+        print("\t             mine: ", " ".join(str(y) for y in t["mine"]))
+        print("\t            known: ", " ".join(str(k) for k in t["known"]))
+        print("\t epi_equals_known: ", t["epi_equals_known"])
+        print("\tmine_equals_known: ", t["mine_equals_known"])
+        print()
 
 if __name__ == '__main__':
     # TODO ugly
-    num_tests = 10
+    num_tests = 100
     tests = [i for i in range(num_tests)]
     results = []
     known = get_known()
@@ -66,17 +77,11 @@ if __name__ == '__main__':
             "mine_equals_known": mine_equals_known
         })
 
-    for r in results:
-        # tedious pretty printing
-        print("\t             test: ", r["test"])
-        print("\t           result: ", r["result"])
-        print("\t              epi: ", " ".join(str(x) for x in r["epi"]))
-        print("\t             mine: ", " ".join(str(y) for y in r["mine"]))
-        print("\t            known: ", " ".join(str(k) for k in r["known"]))
-        print("\t epi_equals_known: ", r["epi_equals_known"])
-        print("\tmine_equals_known: ", r["mine_equals_known"])
-
     print("num tests: ", len(results))
-    num_failed = len([r for r in results if not r["result"]])
+    failed = [r for r in results if not r["result"]]
+    num_failed = len(failed)
+    if num_failed > 0:
+        pretty_print(failed)
+
     print("num failed: ", num_failed)
     print("pct failed tests: ", (num_failed / num_tests) * 100)
