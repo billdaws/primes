@@ -1,6 +1,11 @@
 def check_equal(L1, L2):
     return len(L1) == len(L2) and sorted(L1) == sorted(L2)
 
+def compare_to_known(l, known):
+    """Sort known before using this function.
+    """
+    return len(l) == len(known) and sorted(l) == known
+
 def epi_generate_primes(n: int) -> list:
     if n < 2:
         return []
@@ -29,22 +34,49 @@ def my_generate_primes(n: int) -> list:
 
     return primes
 
+def get_known():
+    """Will only check first million primes.
+    TODO get more
+    """
+    with open("data/primes1.txt") as f:
+        content = f.readlines()
+    content = sorted([int(x.strip()) for x in content])
+    return content
+
 
 if __name__ == '__main__':
-    tests = [i for i in range(100000)]
-    failed_tests = []
+    # TODO ugly
+    num_tests = 10
+    tests = [i for i in range(num_tests)]
+    results = []
+    known = get_known()
     for test in tests:
-        l1 = epi_generate_primes(test)
-        l2 = my_generate_primes(test)
-        result = check_equal(l1, l2)
-        if not result:
-            failed_tests.append({
-                "test": test,
-                "epi": l1,
-                "mine": l2
-            })
+        epi = epi_generate_primes(test)
+        mine = my_generate_primes(test)
+        known_slice = [i for i in known if i <= test]
+        epi_equals_known = compare_to_known(epi, known_slice)
+        mine_equals_known = compare_to_known(mine, known_slice)
+        results.append({
+            "test": test,
+            "result": check_equal(epi, mine) and mine_equals_known,
+            "epi": epi,
+            "mine": mine,
+            "known": known_slice,
+            "epi_equals_known": epi_equals_known,
+            "mine_equals_known": mine_equals_known
+        })
 
-    for failed in failed_tests:
-        print("\ttest: ", failed["test"])
-        print("\t epi: ", " ".join(str(x) for x in failed["epi"]))
-        print("\tmine: ", " ".join(str(y) for y in failed["mine"]))
+    for r in results:
+        # tedious pretty printing
+        print("\t             test: ", r["test"])
+        print("\t           result: ", r["result"])
+        print("\t              epi: ", " ".join(str(x) for x in r["epi"]))
+        print("\t             mine: ", " ".join(str(y) for y in r["mine"]))
+        print("\t            known: ", " ".join(str(k) for k in r["known"]))
+        print("\t epi_equals_known: ", r["epi_equals_known"])
+        print("\tmine_equals_known: ", r["mine_equals_known"])
+
+    print("num tests: ", len(results))
+    num_failed = len([r for r in results if not r["result"]])
+    print("num failed: ", num_failed)
+    print("pct failed tests: ", (num_failed / num_tests) * 100)
