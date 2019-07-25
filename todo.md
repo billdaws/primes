@@ -7,3 +7,6 @@
 1. parallelize result generation
 2. convert algorithm to generator
     a. consider convert epi algorithm?
+
+# misc
+1. track this in GitHub issues?
